@@ -35,37 +35,39 @@ class ShallowNN:
         self.bias = new_b
 
 
-    def matrix_back_propagation(self, X, delta):
-        #TODO: complete GD 
+    def matrix_back_propagation(self, X, Y, delta, iterations = 100, animate = False):
+
+        if animate: 
+            fig, boundary,x_axis = self.__init__animation__(X,Y)
+
+        #TODO: fix GD computation, beacuse it is not working now
         dl = delta
-        do = self.activation.derivative(self.matrix_linear(X)) * dl
         dw = X
         n = len(X)
-        new_w = self.weights - self.gamma *  np.dot(dw.T, do) / n
-        new_b = self.bias - self.gamma * np.sum(do * dl) / n
-        self.weights = new_w
-        self.bias = new_b
+        for _ in range(iterations):
+            Z = self.matrix_linear(X)
+            do = self.activation.derivative(Z)
+            new_w = self.weights - self.gamma *  np.dot(dw.T, do * dl) / n
+            new_b = self.bias - self.gamma * np.sum(do * dl) / n
+            self.weights = new_w
+            self.bias = new_b
+            if animate:
+                self.__animate__(fig, boundary,x_axis)
 
     def fit(self, X, Y, animate=False, matrix = False):
         if matrix:
-            self.__matrix_fit__(X,Y)
+            self.__matrix_fit__(X,Y, animate=animate)
         else: 
             self.__fit__(X,Y,animate=animate)
 
-    def __matrix_fit__(self, X, Y):
+    def __matrix_fit__(self, X, Y, animate = False):
         Y_pred = self.matrix_feed(X)
         delta = self.loss_function.derivative( np.sign(Y_pred), Y )
-        self.matrix_back_propagation(X, delta)
+        self.matrix_back_propagation(X, Y, delta, animate=animate)
 
     def __fit__(self, X, Y, animate=False):
         if animate: 
-            fig = plt.figure()
-            ax = fig.add_subplot(111)
-            plt.scatter(X[:,0], X[:,1], c=Y)
-            x_axis = np.linspace(np.min(X[:,0]), np.max(X[:,1]), 100)
-            line = -(self.weights[0] / self.weights[1]) * x_axis - self.bias / self.weights[1]
-            boundary, = ax.plot(x_axis, line )
-            plt.show(block=False)
+            fig,boundary, x_axis = self.__init__animation__(X, Y)
 
         for (x, y) in zip(X,Y):
             y_p = self.feed(x)
@@ -73,11 +75,24 @@ class ShallowNN:
             self.back_propagate(x, delta)
 
             if animate:
-                line = -(self.weights[1] / self.weights[0]) * x_axis - self.bias / self.weights[1]
-                boundary.set_ydata(line)
-                fig.canvas.draw()
-                fig.canvas.flush_events()
+                self.__animate__(fig,boundary,x_axis)
     
+    def __init__animation__(self,X,Y):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        plt.scatter(X[:,0], X[:,1], c=Y)
+        x_axis = np.linspace(np.min(X[:,0]), np.max(X[:,1]), 100)
+        line = -(self.weights[0] / self.weights[1]) * x_axis - self.bias / self.weights[1]
+        boundary, = ax.plot(x_axis, line )
+        plt.show(block=False)
+        return fig, boundary, x_axis
+
+    def __animate__(self, fig, boundary, x_axis):
+        line = -(self.weights[1] / self.weights[0]) * x_axis - self.bias / self.weights[1]
+        boundary.set_ydata(line)
+        fig.canvas.draw()
+        fig.canvas.flush_events()
+
     def predict(self, X):
         y_pred = []
         print(self.weights, self.bias)

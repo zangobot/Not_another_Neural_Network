@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification, make_blobs
 from sklearn.model_selection import StratifiedShuffleSplit
 
-features = 5
+features = 10
 # X,y = make_classification(n_samples=500, n_classes=2, n_features=2, n_informative=2, n_redundant=0, n_repeated=0)
-X,y = make_blobs(n_samples=3000, centers=2, n_features=features)
+X,y = make_blobs(n_samples=300, centers=2, n_features=features)
 y[y==0] = -1
 s = StratifiedShuffleSplit(test_size=0.05)
 for tr, ts in s.split(X,y):
