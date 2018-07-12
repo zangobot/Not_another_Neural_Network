@@ -13,7 +13,7 @@ for tr, ts in s.split(X,y):
     X_tr, X_ts = X[tr], X[ts]
     y_tr, y_ts = y[tr], y[ts]
 
-net = nn.ShallowNN(input_dimension=features, gamma=1e-2)
+net = nn.SingleNeuronNN(input_dimension=features, gamma=1e-2)
 net.fit(X_tr, y_tr, animate=False, matrix=True)
 y_pred = net.predict(X_ts).ravel()
 print(y_pred,'\n',y_ts)
