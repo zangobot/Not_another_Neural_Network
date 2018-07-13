@@ -18,6 +18,7 @@ class SingleNeuronNN:
         self.activation = act_func if act_func is not None else relu_func
         self.gamma = gamma
         self.bias = np.random.randn()
+        self.__last_input__ = None
         if weights is None:
             self.weights = np.random.randn(input_dimension)
         
@@ -25,12 +26,14 @@ class SingleNeuronNN:
         """
         Returns the output for a single point.
         """
+        self.__last_input__ = x
         return self.activation.func( self.linear(x) )
 
     def matrix_feed(self, X):
         """
         Returns the output for a set of points.
         """
+        self.__last_input__ = X
         return self.activation.func(self.matrix_linear(X))
 
     def linear(self, x):
