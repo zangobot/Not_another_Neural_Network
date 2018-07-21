@@ -26,14 +26,14 @@ class SingleNeuronNN:
         """
         Returns the output for a single point.
         """
-        self.__last_input__ = x
+        self.__last_input__ = x.copy()
         return self.activation.func( self.linear(x) )
 
     def matrix_feed(self, X):
         """
         Returns the output for a set of points.
         """
-        self.__last_input__ = X
+        self.__last_input__ = X.copy()
         return self.activation.func(self.matrix_linear(X))
 
     def linear(self, x):
@@ -65,6 +65,7 @@ class SingleNeuronNN:
     def matrix_back_propagation(self, X, Y, delta, iterations = 100, animate = False):
         """
         Back propagation algorithm for a set of points.
+        Y is used only for animation
         """
         if animate: 
             fig, boundary,x_axis = self.__init__animation__(X,Y)
@@ -151,6 +152,11 @@ class SingleNeuronNN:
             y_pred.append( np.sign(y) )
         return np.array(y_pred)
 
+    def delta_matrix(self, delta_from_above):
+        drv = self.activation.derivative(self.__last_input__)
+        multiplied_weights = np.dot(self.weights, drv)
+        print('SHAPE of delta is: ',multiplied_weights.shape)
+        return delta_from_above * multiplied_weights
         
                 
         
